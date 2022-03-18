@@ -1,6 +1,8 @@
 exibitstream
 sandbox/*
 movie/*
+.DS*
+*.swp
 
 # Prerequisites
 *.d

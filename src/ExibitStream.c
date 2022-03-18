@@ -8,7 +8,11 @@
 #include <time.h>
 #include "pthread.h"
 
-#define BUF 256
+#if __APPLE__
+    #define MPV "/opt/homebrew/bin/mpv"
+#elif __linux__
+    #define MPV "/bin/mpv"
+#endif
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -30,11 +34,11 @@ void loadplaylist(struct video* vds, char *config_path)
     fp = fopen(config_path,"r");
     while(fscanf(fp,"%s %d %d %d", path,&stream_time,&begin_time,&end_time) != EOF)
     {
-	strcpy(vds[cnt].path,path);
-	vds[cnt].stream_time = stream_time;
-	vds[cnt].begin_time = begin_time;
-	vds[cnt].end_time = end_time;
-	cnt++;
+    	strcpy(vds[cnt].path,path);
+    	vds[cnt].stream_time = stream_time;
+    	vds[cnt].begin_time = begin_time;
+    	vds[cnt].end_time = end_time;
+    	cnt++;
     }
 
 }
@@ -51,11 +55,11 @@ void loopstream(struct video *vd)
     //スタートのタイミングを探る
     for(;;)
     {
-	if(time(NULL) >= vd->begin_time)
-	{
-	    execl("/bin/mpv","/bin/mpv",option,"--length=3",vd->path,NULL);	
-	    break;
-	}
+    	if(time(NULL) >= vd->begin_time)
+    	{
+    	    execl(MPV,MPV,option,"--keep-open","--fs",vd->path,NULL);	
+    	    break;
+    	}
     }
 }
 
@@ -66,23 +70,23 @@ void stream_process(struct video *vd)
     pid = fork();
     if(pid < 0)
     {
-	printf("create proc fail\n");
+	   printf("create proc fail\n");
     }
     else if(pid == 0)
     {
-	loopstream(vd);
+	   loopstream(vd);
     }
     else
     {
-	for(;;)
-	{
-	    if((int)time(NULL) > vd->end_time)
-	    {
-		//kill(pid,SIGKILL);
-		wait(NULL);
-		break;
-	    }
-	}
+    	for(;;)
+    	{
+    	    if((int)time(NULL) > vd->end_time)
+    	    {
+        		kill(pid,SIGINT);
+        		wait(NULL);
+        		break;
+    	    }
+    	}
     }
 }
 
@@ -93,20 +97,20 @@ int main (int argc, char *argv[])
     int now = (int)time(NULL);
     printf("now is %d\n",now);
     struct video vd[2];
-    struct video vd1 = {"./movie/sample-20s.mp4",3,now+1,now+7};
-    struct video vd2 = {"./movie/sample-30s.mp4",3,now+7,now+15};
+    struct video vd1 = {"./movie/sample-5s.mp4",5,now+1,now+11};
+    struct video vd2 = {"./movie/sample-10s.mp4",10,now+6,now+26};
     vd[0]=vd1;
     vd[1]=vd2;
     int ret;
 
     for(int i=0;i<2;i++)
     {
-	pthread_create(&th[i],NULL,(void*)stream_process,&vd[i]);
+	   pthread_create(&th[i],NULL,(void*)stream_process,&vd[i]);
     }
     //終了
     for(int i=0;i<2;i++)
     {
-	ret = pthread_join(th[i],NULL);
+	   ret = pthread_join(th[i],NULL);
     }
     return 0;
 }
