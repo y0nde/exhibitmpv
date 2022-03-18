@@ -57,7 +57,7 @@ void loopstream(struct video *vd)
     {
     	if(time(NULL) >= vd->begin_time)
     	{
-    	    execl(MPV,MPV,option,"--keep-open","--fs",vd->path,NULL);	
+    	    execl(MPV,MPV,option,"--keep-open","--fs"  ,vd->path,NULL);	
     	    break;
     	}
     }
@@ -97,12 +97,13 @@ int main (int argc, char *argv[])
     int now = (int)time(NULL);
     printf("now is %d\n",now);
     struct video vd[2];
-    struct video vd1 = {"./movie/sample-5s.mp4",5,now+1,now+11};
-    struct video vd2 = {"./movie/sample-10s.mp4",10,now+6,now+26};
-    vd[0]=vd1;
-    vd[1]=vd2;
+    //struct video vd1 = {"./movie/sample-5s.mp4",5,now+1,now+11};
+    //struct video vd2 = {"./movie/sample-10s.mp4",10,now+6,now+26};
+    //vd[0]=vd1;
+    //vd[1]=vd2;
     int ret;
 
+    loadplaylist(vd,"./schedule.txt");
     for(int i=0;i<2;i++)
     {
 	   pthread_create(&th[i],NULL,(void*)stream_process,&vd[i]);
