@@ -81,8 +81,8 @@ void singlestream(struct video *vd)
     {
         if(time(NULL) >= vd->begin_time)
         {
-            //execl(MPV,MPV,"--keep-open","-v","--fs",vd->path,NULL); 
-            execl("/usr/local/bin/iina","/usr/local/bin/iina","--mpv-keep-open","--mpv-fs",vd->path,NULL); 
+            execl(MPV,MPV,"--keep-open","--fs",vd->path,NULL); 
+            //execl("/usr/local/bin/iina","/usr/local/bin/iina","--mpv-keep-open","--mpv-fs",vd->path,NULL); 
             break;
         }
         else if(time(NULL) > vd->begin_time)
@@ -169,6 +169,7 @@ int main (int argc, char *argv[])
     FILE *fp;
     int now = (int)time(NULL);
     int nchapter;
+    int prev_begin = 0;
     if(argc < 3)
     {
         printf("exhibitstream [shedule.txt] [num_chapter]\n");
@@ -194,8 +195,21 @@ int main (int argc, char *argv[])
 
     for(int i=0;i<nchapter;i++)
     {
-	   pthread_create(&th[i],NULL,(void*)single_stream_process,&vd[i]);
-
+        if(i!=0)
+        {
+            int wait_time;
+            //スタートのタイミングを探る
+            if(prev_begin > (int)time(NULL))
+            {
+                wait_time = prev_begin - (int)time(NULL);
+                if(wait_time > 0)
+                {
+                   sleep(wait_time); 
+                }
+            }
+        }
+        pthread_create(&th[i],NULL,(void*)single_stream_process,&vd[i]);
+        prev_begin = vd[i].begin_time;
     }
     //終了
     for(int i=0;i<nchapter;i++)

@@ -4,6 +4,7 @@ movie/*
 .DS*
 *.swp
 .ipynb_checkpoints/
+*.dSYM
 
 # Prerequisites
 *.d
