@@ -24,6 +24,17 @@ struct video
     int end_time;
 };
 
+int today_epoch()
+{
+    time_t now = time(NULL);
+    struct tm *x = localtime(&now);
+    x->tm_sec = 0;
+    x->tm_min = 0;
+    x->tm_hour = 0;
+    time_t today = mktime(x);
+    return (int)today;
+}
+
 void loadplaylist(struct video* vds, char *config_path)
 {
     FILE *fp;
@@ -31,16 +42,54 @@ void loadplaylist(struct video* vds, char *config_path)
     int stream_time,begin_time,end_time;
     char path[256];
 
+    //today
+    int today = today_epoch();
+    printf("now is %d\n",(int)time(NULL));
+    printf("today is %d\n",today);
+
+    //read
     fp = fopen(config_path,"r");
+
     while(fscanf(fp,"%s %d %d %d", path,&stream_time,&begin_time,&end_time) != EOF)
     {
-    	strcpy(vds[cnt].path,path);
-    	vds[cnt].stream_time = stream_time;
-    	vds[cnt].begin_time = begin_time;
-    	vds[cnt].end_time = end_time;
+        //printf("%d <=> %s %d %d %d\n",cnt,path,stream_time,begin_time,end_time);
+    	strcpy((vds+cnt)->path,path);
+    	(vds+cnt)->stream_time = stream_time;
+    	(vds+cnt)->begin_time = today + begin_time;
+    	(vds+cnt)->end_time = today + end_time;
+        //printf("%d begin_time <=> %d\n",cnt,(vds+cnt)->begin_time);
+        //printf("%d end_time   <=> %d\n",cnt,(vds+cnt)->end_time);
     	cnt++;
     }
 
+}
+
+void singlestream(struct video *vd)
+{
+    int wait_time;
+    //スタートのタイミングを探る
+    if(vd->begin_time > (int)time(NULL))
+    {
+        wait_time = vd->begin_time - (int)time(NULL) - 1;
+        if(wait_time > 0)
+        {
+           sleep(wait_time); 
+        }
+    }
+    
+    for(;;)
+    {
+        if(time(NULL) >= vd->begin_time)
+        {
+            //execl(MPV,MPV,"--keep-open","-v","--fs",vd->path,NULL); 
+            execl("/usr/local/bin/iina","/usr/local/bin/iina","--mpv-keep-open","--mpv-fs",vd->path,NULL); 
+            break;
+        }
+        else if(time(NULL) > vd->begin_time)
+        {
+            break;
+        }
+    }
 }
 
 void loopstream(struct video *vd)
@@ -63,8 +112,33 @@ void loopstream(struct video *vd)
     }
 }
 
+void single_stream_process(struct video *vd)
+{
+    pid_t pid;
+    pid = fork();
+    if(pid < 0)
+    {
+       printf("create proc fail\n");
+    }
+    else if(pid == 0)
+    {
+       singlestream(vd);
+    }
+    else
+    {
+        for(;;)
+        {
+            if((int)time(NULL) > vd->end_time)
+            {
+                kill(pid,SIGINT);
+                wait(NULL);
+                break;
+            }
+        }
+    }
+}
 
-void stream_process(struct video *vd)
+void loop_stream_process(struct video *vd)
 {
     pid_t pid;
     pid = fork();
@@ -93,23 +167,38 @@ void stream_process(struct video *vd)
 int main (int argc, char *argv[])
 {
     FILE *fp;
-    pthread_t th[2];
     int now = (int)time(NULL);
-    printf("now is %d\n",now);
-    struct video vd[2];
+    int nchapter;
+    if(argc < 3)
+    {
+        printf("exhibitstream [shedule.txt] [num_chapter]\n");
+        exit(0);
+    }
+    else
+    {
+        nchapter = atoi(argv[2]);
+    }
+
+    //スレッドとvideo配列を初期化
+    pthread_t th[nchapter];
+    struct video vd[nchapter];
+
+    //struct video vd[2];
     //struct video vd1 = {"./movie/sample-5s.mp4",5,now+1,now+11};
     //struct video vd2 = {"./movie/sample-10s.mp4",10,now+6,now+26};
     //vd[0]=vd1;
     //vd[1]=vd2;
     int ret;
 
-    loadplaylist(vd,"./schedule.txt");
-    for(int i=0;i<2;i++)
+    loadplaylist(vd,argv[1]);
+
+    for(int i=0;i<nchapter;i++)
     {
-	   pthread_create(&th[i],NULL,(void*)stream_process,&vd[i]);
+	   pthread_create(&th[i],NULL,(void*)single_stream_process,&vd[i]);
+
     }
     //終了
-    for(int i=0;i<2;i++)
+    for(int i=0;i<nchapter;i++)
     {
 	   ret = pthread_join(th[i],NULL);
     }
