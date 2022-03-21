@@ -52,14 +52,11 @@ void loadplaylist(struct video* vds, char *config_path)
 
     while(fscanf(fp,"%s %d %d %d", path,&stream_time,&begin_time,&end_time) != EOF)
     {
-        //printf("%d <=> %s %d %d %d\n",cnt,path,stream_time,begin_time,end_time);
-    	strcpy((vds+cnt)->path,path);
+        strcpy((vds+cnt)->path,path);
     	(vds+cnt)->stream_time = stream_time;
     	(vds+cnt)->begin_time = today + begin_time;
     	(vds+cnt)->end_time = today + end_time;
-        //printf("%d begin_time <=> %d\n",cnt,(vds+cnt)->begin_time);
-        //printf("%d end_time   <=> %d\n",cnt,(vds+cnt)->end_time);
-    	cnt++;
+        cnt++;
     }
 
 }
@@ -82,7 +79,6 @@ void singlestream(struct video *vd)
         if(time(NULL) >= vd->begin_time)
         {
             execl(MPV,MPV,"--keep-open","--fs",vd->path,NULL); 
-            //execl("/usr/local/bin/iina","/usr/local/bin/iina","--mpv-keep-open","--mpv-fs",vd->path,NULL); 
             break;
         }
         else if(time(NULL) > vd->begin_time)
@@ -184,11 +180,6 @@ int main (int argc, char *argv[])
     pthread_t th[nchapter];
     struct video vd[nchapter];
 
-    //struct video vd[2];
-    //struct video vd1 = {"./movie/sample-5s.mp4",5,now+1,now+11};
-    //struct video vd2 = {"./movie/sample-10s.mp4",10,now+6,now+26};
-    //vd[0]=vd1;
-    //vd[1]=vd2;
     int ret;
 
     loadplaylist(vd,argv[1]);
