@@ -1,7 +1,9 @@
-exibitstream*
-sandbox/*
-movie/*
+exibitstream
+video
+sandbox
+movie
 .DS*
+*.txt
 *.swp
 .ipynb_checkpoints/
 *.dSYM
