@@ -1,13 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <string>
 
-struct play_event {
-    std::string path;
-    time_t start_time;
-    long playlength;
-};
+#include "schedulereader.h"
 
 std::vector<std::string> splitstr(std::string str, std::string delimeter = " "){
     std::vector<std::string> words;
@@ -22,8 +16,8 @@ std::vector<std::string> splitstr(std::string str, std::string delimeter = " "){
     return words;
 }
 
-struct play_event conv_strv_playevent(const std::vector<std::string> &strv){
-    struct play_event pe = {
+struct PlayEvent conv_strv_playevent(const std::vector<std::string> &strv){
+    struct PlayEvent pe = {
         "", 0, 0
     };
     if(strv.size() >= 3){
@@ -37,12 +31,12 @@ struct play_event conv_strv_playevent(const std::vector<std::string> &strv){
     return pe;
 }
 
-struct play_event conv_str_playevent(const std::string &str){
+struct PlayEvent conv_str_playevent(const std::string &str){
     return conv_strv_playevent(splitstr(str));
 }
 
-std::vector<struct play_event> schedule_reader(const std::string &schedule_path){
-    std::vector<struct play_event> pes;
+std::vector<struct PlayEvent> schedule_reader(const std::string &schedule_path){
+    std::vector<struct PlayEvent> pes;
     std::fstream fs(schedule_path);
     if(!fs){
         std::cerr << "fstream error" << std::endl;
@@ -51,7 +45,7 @@ std::vector<struct play_event> schedule_reader(const std::string &schedule_path)
     while(!fs.eof()){
         std::string event_str;
         std::getline(fs, event_str);
-        struct play_event pe = conv_str_playevent(event_str);
+        struct PlayEvent pe = conv_str_playevent(event_str);
         if(!pe.path.empty()){
             pes.push_back(pe);
         }
@@ -59,10 +53,10 @@ std::vector<struct play_event> schedule_reader(const std::string &schedule_path)
     return pes;
 }
 
-int main(){
-    std::vector<struct play_event> pes = 
+int schedulereader_test(){
+    std::vector<struct PlayEvent> pes = 
         schedule_reader("file.txt");
-    for(const struct play_event &pe : pes){
+    for(const struct PlayEvent &pe : pes){
         std::cout << pe.path << std::endl;
         std::cout << pe.start_time << std::endl;
         std::cout << pe.playlength << std::endl;
