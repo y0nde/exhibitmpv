@@ -2,7 +2,7 @@
 
 #include "command.h"
 
-const std::string h_command = "{ \"command\": [\"";
+const std::string h_command = "\n{ \"command\": [\"";
 const std::string t_command = "\"] }\n";
 std::string CommandGenerator::loadfile(const std::string &path){
     const std::string s_loadfile = "loadfile\", \"";

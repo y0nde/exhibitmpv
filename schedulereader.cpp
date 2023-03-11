@@ -1,7 +1,10 @@
 #include <iostream>
 #include <fstream>
+#include <ctime>
+#include <stdexcept>
 
 #include "schedulereader.h"
+#include "timer.h"
 
 std::vector<std::string> splitstr(std::string str, std::string delimeter = " "){
     std::vector<std::string> words;
@@ -16,6 +19,35 @@ std::vector<std::string> splitstr(std::string str, std::string delimeter = " "){
     return words;
 }
 
+time_t today_start_epoch(){
+    struct tm* time_point_ptr;
+    time_t now = time(NULL); 
+    time_point_ptr = localtime(&now);
+    if(time_point_ptr == NULL){
+        return -1;
+    }
+    time_point_ptr->tm_hour = 0;
+    time_point_ptr->tm_min = 0;
+    time_point_ptr->tm_sec = 0;
+    time_t today_start_epoch = mktime(time_point_ptr);
+    return today_start_epoch;
+}
+
+time_t conv_strt_time_t(const std::string& strt){
+    struct tm parsed_time = {0};
+    if(strptime(strt.c_str(), "%H:%M:%S", &parsed_time) == NULL){
+        throw std::invalid_argument("format is %H:%M:%S");
+    }else{
+        long parsed_time_sec = parsed_time.tm_hour * 60 * 60 + parsed_time.tm_min * 60 + parsed_time.tm_sec;
+        return parsed_time_sec;
+    }
+}
+
+time_t conv_strt_today_time_t(const std::string& strt){
+    time_t time_in_today = conv_strt_time_t(strt);
+    return today_start_epoch() + time_in_today;
+}
+
 struct PlayEvent conv_strv_playevent(const std::vector<std::string> &strv){
     struct PlayEvent pe = {
         "", 0, 0
@@ -23,7 +55,8 @@ struct PlayEvent conv_strv_playevent(const std::vector<std::string> &strv){
     if(strv.size() >= 3){
         try {
             pe.path = strv[0];
-            pe.start_time = std::stol(strv[1]); 
+            //pe.start_time = std::stol(strv[1]); 
+            pe.start_time = conv_strt_today_time_t(strv[1]); 
             pe.playlength = std::stol(strv[2]); 
         }
         catch(...) { return pe; }
