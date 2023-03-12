@@ -1,6 +1,6 @@
 project('mpvapp', 'cpp', default_options : ['cpp_std=c++20'])
 
-incdir = include_directories('/Users/yonde/Packages/boost/include')
+#incdir = include_directories('/Users/yonde/Packages/boost/include')
 
 #mpv_header = include_directories('/opt/homebrew/include')
 
@@ -28,4 +28,5 @@ executable('mpvapp',
   'schedulereader.cpp',
   'timer.cpp',
   dependencies : [],
-  include_directories: [incdir])
+  include_directories: [])
+  #include_directories: [incdir])
