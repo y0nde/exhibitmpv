@@ -1,3 +1,3 @@
-00:25:00 video/ushiodenki.mov 100
-00:26:00 video/WBC.mp4 100
-00:27:00 video/tenjin20230315.mov 100
+00:30:00 video/ushiodenki.mov 100
+00:31:00 video/WBC.mp4 100
+00:32:00 video/tenjin20230315.mov 100
