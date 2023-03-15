@@ -30,3 +30,13 @@ executable('mpvapp',
   dependencies : [],
   include_directories: [])
   #include_directories: [incdir])
+  
+executable('test-mpvapp', 
+  'test.cpp',
+  'command.cpp',
+  'commandsender.cpp',
+  'scheduler.cpp',
+  'schedulereader.cpp',
+  'timer.cpp',
+  dependencies : [],
+  include_directories: [])

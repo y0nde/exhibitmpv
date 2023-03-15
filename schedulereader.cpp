@@ -54,9 +54,9 @@ struct PlayEvent conv_strv_playevent(const std::vector<std::string> &strv){
     };
     if(strv.size() >= 3){
         try {
-            pe.path = strv[0];
+            pe.path = strv[1];
             //pe.start_time = std::stol(strv[1]); 
-            pe.start_time = conv_strt_today_time_t(strv[1]); 
+            pe.start_time = conv_strt_today_time_t(strv[0]); 
             pe.playlength = std::stol(strv[2]); 
         }
         catch(...) { return pe; }
