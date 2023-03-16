@@ -27,6 +27,7 @@ executable('mpvapp',
   'scheduler.cpp',
   'schedulereader.cpp',
   'timer.cpp',
+  'slack.cpp'
   dependencies : [],
   include_directories: [])
   #include_directories: [incdir])
@@ -38,5 +39,6 @@ executable('test-mpvapp',
   'scheduler.cpp',
   'schedulereader.cpp',
   'timer.cpp',
+  'slack.cpp'
   dependencies : [],
   include_directories: [])

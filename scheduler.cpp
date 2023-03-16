@@ -48,10 +48,15 @@ int Scheduler::exec_event(const struct PlayEvent &event){
         //return -1;
     //}
     //mcc.mpv_recv();
+    
+    //send notification to slack
+    std::string message = "playing " + event.path;
+    sbot.send(message);
     return 0;
 }
 
 int Scheduler::run(){
+    sbot.run();
     if(mcc.mpv_connect("/tmp/mpvsocket") < 0){
         return 0;
     }
