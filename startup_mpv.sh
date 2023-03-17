@@ -1,6 +1,6 @@
 #!/bin/sh
 
-nrow=`pgrep 'mpv' | wc -l`
+nrow=`pgrep 'mpv -' | wc -l`
 if [ $nrow -ge 1 ]; then
     echo 'alread active'
 else 
