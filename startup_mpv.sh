@@ -1,8 +1,8 @@
 #!/bin/sh
 
-nrow=`pgrep 'mpv -' | wc -l`
+nrow=`pgrep 'IINA' | wc -l`
 if [ $nrow -ge 1 ]; then
     echo 'alread active'
 else 
-    mpv - -fs --input-ipc-server=/tmp/mpvsocket --keep-open --keep-open-pause=no -vo=gpu -hwdec=no
+    iina video/BLACK.mp4 --mpv-input-ipc-server=/tmp/mpvsocket --mpv-keep-open-pause=no
 fi

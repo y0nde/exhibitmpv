@@ -1,2 +1,0 @@
-./video/SL3.mp4 1678067593 100
-./video/starwars.mp4 1678067596 200
