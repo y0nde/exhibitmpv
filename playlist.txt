@@ -1,4 +1,6 @@
 video/ushiodenki.mov
-video/GlowofTokyo.mov
-video/tenjin20230315.mov
-video/w-b-c.mp4
+video/GlowOfTokyo.mov
+video/tenjin.mov
+video/WBC.mp4
+video/Tokyo500yesrs.mp4
+video/SL4_20230315.mp4
