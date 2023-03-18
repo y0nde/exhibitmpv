@@ -39,7 +39,7 @@ int Scheduler::exec_event(const struct PlayEvent &event){
     std::string command = cg.loadfile(event.path);
     std::string start = cg.start();
     sleep_until_epoch_t(event.start_time);
-    if(mcc.mpv_send(command) < 0){
+    if(mcc.mpv_send_safe(command) < 0){
         std::cerr << __FUNCTION__ << " fail" << std::endl;
         return -1;
     }
@@ -57,9 +57,6 @@ int Scheduler::exec_event(const struct PlayEvent &event){
 
 int Scheduler::run(){
     sbot.run();
-    if(mcc.mpv_connect("/tmp/mpvsocket") < 0){
-        return 0;
-    }
     while(1){
         //if(mcc.mpv_connect("/tmp/mpvsocket") < 0){
             //return 0;

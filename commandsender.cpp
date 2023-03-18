@@ -3,7 +3,9 @@
 #include <unistd.h>
 #include "commandsender.h"
 
-int MpvCommandClient::mpv_connect(const std::string &path){
+static std::string path = "/tmp/mpvsocket";
+
+int MpvCommandClient::mpv_connect(){
     int rc;
     struct sockaddr_un sun;
     memset(&sun, 0, sizeof(sun));
@@ -42,6 +44,21 @@ int MpvCommandClient::mpv_send(const std::string &str){
         std::cout << "send error" << std::endl;
     }
     std::cout << str << std::endl;
+    return rc;
+}
+
+int MpvCommandClient::mpv_send_safe(const std::string &str){
+    int rc{0};
+    rc = mpv_connect();
+    if(rc < 0) return -1;
+    rc = send(mpv_socket, str.c_str(), str.size() + 1, 0);
+    if(rc < 0){
+        std::cout << "send error" << std::endl;
+    }
+    std::cout << str << std::endl;
+    sleep(1);
+    rc = mpv_close();
+    if(rc < 0) return -1;
     return rc;
 }
 
